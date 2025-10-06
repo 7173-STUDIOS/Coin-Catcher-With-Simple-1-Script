@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Coin Catcher</title>
+<style>
+  body {
+    margin: 0;
+    overflow: hidden;
+    background: #222;
+    color: white;
+    font-family: sans-serif;
+  }
+  #gameCanvas {
+    display: block;
+    background: #333;
+  }
+</style>
+</head>
+<body>
+<canvas id="gameCanvas" width="400" height="600"></canvas>
+
+<script>
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+
+let player = { x: canvas.width/2 - 25, y: canvas.height - 50, width: 50, height: 20, speed: 7 };
+let coins = [];
+let score = 0;
+let spawnInterval = 1000;
+let lastSpawn = Date.now();
+
+function spawnCoin() {
+  coins.push({ x: Math.random() * (canvas.width - 20), y: 0, size: 20 });
+}
+
+function draw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Draw player
+  ctx.fillStyle = 'cyan';
+  ctx.fillRect(player.x, player.y, player.width, player.height);
+
+  // Draw coins
+  ctx.fillStyle = 'gold';
+  coins.forEach(c => ctx.fillRect(c.x, c.y, c.size, c.size));
+
+  // Draw score
+  ctx.fillStyle = 'white';
+  ctx.font = '20px Arial';
+  ctx.fillText('Score: ' + score, 10, 30);
+}
+
+function update() {
+  // Spawn coins
+  if (Date.now() - lastSpawn > spawnInterval) {
+    spawnCoin();
+    lastSpawn = Date.now();
+  }
+
+  // Move coins
+  coins.forEach(c => c.y += 3);
+
+  // Check collisions
+  coins = coins.filter(c => {
+    if (c.x < player.x + player.width &&
+        c.x + c.size > player.x &&
+        c.y < player.y + player.height &&
+        c.y + c.size > player.y) {
+      score++;
+      return false; // Remove caught coin
+    }
+    return c.y < canvas.height; // Remove if off screen
+  });
+}
+
+function gameLoop() {
+  update();
+  draw();
+  requestAnimationFrame(gameLoop);
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowLeft') player.x -= player.speed;
+  if (e.key === 'ArrowRight') player.x += player.speed;
+  // Keep player inside canvas
+  if (player.x < 0) player.x = 0;
+  if (player.x + player.width > canvas.width) player.x = canvas.width - player.width;
+});
+
+gameLoop();
+</script>
+</body>
+</html>
