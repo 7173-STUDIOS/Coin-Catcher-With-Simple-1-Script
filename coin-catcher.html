@@ -8,12 +8,15 @@
     margin: 0;
     overflow: hidden;
     background: #222;
-    color: white;
     font-family: sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
   }
-  #gameCanvas {
-    display: block;
+  canvas {
     background: #333;
+    display: block;
   }
 </style>
 </head>
@@ -24,16 +27,21 @@
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
+// Player setup
 let player = { x: canvas.width/2 - 25, y: canvas.height - 50, width: 50, height: 20, speed: 7 };
+
+// Coins setup
 let coins = [];
 let score = 0;
 let spawnInterval = 1000;
 let lastSpawn = Date.now();
 
+// Spawn a coin
 function spawnCoin() {
   coins.push({ x: Math.random() * (canvas.width - 20), y: 0, size: 20 });
 }
 
+// Draw everything
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -51,6 +59,7 @@ function draw() {
   ctx.fillText('Score: ' + score, 10, 30);
 }
 
+// Update game state
 function update() {
   // Spawn coins
   if (Date.now() - lastSpawn > spawnInterval) {
@@ -74,12 +83,14 @@ function update() {
   });
 }
 
+// Main game loop
 function gameLoop() {
   update();
   draw();
   requestAnimationFrame(gameLoop);
 }
 
+// Player movement
 document.addEventListener('keydown', e => {
   if (e.key === 'ArrowLeft') player.x -= player.speed;
   if (e.key === 'ArrowRight') player.x += player.speed;
@@ -88,6 +99,7 @@ document.addEventListener('keydown', e => {
   if (player.x + player.width > canvas.width) player.x = canvas.width - player.width;
 });
 
+// Start the game
 gameLoop();
 </script>
 </body>
